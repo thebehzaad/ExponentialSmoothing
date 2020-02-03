@@ -1,10 +1,3 @@
-"""************************************************************************************
-
-
-
-
-************************************************************************************"""
-#%%
 
 import pandas as pd
 import numpy as np
@@ -37,28 +30,8 @@ def create_datasets(train_file_location, test_file_location):
     return train, test
 
 
-def timeseries_plot(y, color, y_label):
-    # y is Series with index of datetime
-    days = dates.DayLocator()
-    dfmt_minor = dates.DateFormatter('%m-%d')
-    weekday = dates.WeekdayLocator(byweekday=(), interval=1)
 
-    fig, ax = plt.subplots()
-    ax.xaxis.set_minor_locator(days)
-    ax.xaxis.set_minor_formatter(dfmt_minor)
-
-    ax.xaxis.set_major_locator(weekday)
-    ax.xaxis.set_major_formatter(dates.DateFormatter('\n\n%a'))
-
-    ax.set_ylabel(y_label)
-    ax.plot(y.index, y, color)
-    fig.set_size_inches(12, 8)
-    plt.tight_layout()
-    plt.savefig(y_label + '.png', dpi=300)
-    plt.show()
-
-
-def tsplot(y, lags=None, figsize=(12, 7)):
+def ts_stat_plot(y, lags=None, figsize=(12, 7)):
     
     assert isinstance(y, pd.Series), 'Input series y should be of type pd.Series'
         
@@ -78,39 +51,21 @@ def tsplot(y, lags=None, figsize=(12, 7)):
         plt.savefig('diff_ts_plot.png', format='png')
 
 
-def two_timeseries_plot(y1,y2, color, y_label):
+def ts_pair_plot(y1,y2, color, y_label):
     # y is Series with index of datetime
-    days = dates.DayLocator()
-    dfmt_minor = dates.DateFormatter('%m-%d')
-    weekday = dates.WeekdayLocator(byweekday=(), interval=1)
-
+    assert isinstance(y1, pd.Series)
+    assert isinstance(y2, pd.Series)
+    
     fig, ax = plt.subplots()
-    ax.xaxis.set_minor_locator(days)
-    ax.xaxis.set_minor_formatter(dfmt_minor)
-
-    ax.xaxis.set_major_locator(weekday)
-    ax.xaxis.set_major_formatter(dates.DateFormatter('\n\n%a'))
-
     ax.set_ylabel(y_label)
     ax.plot(y1.index, y1, color[0])
     ax.plot(y2.index, y2, color[1])
-    fig.set_size_inches(12, 8)
+    fig.set_size_inches(8, 4)
     plt.tight_layout()
     plt.savefig(y_label + '.png', dpi=300)
     plt.show()
 
 # average time series
-
-def config_plot():
-    plt.style.use('seaborn-paper')
-#    plt.rcParams.update({'axes.prop_cycle': cycler(color='jet')})
-    plt.rcParams.update({'axes.titlesize': 20})
-    plt.rcParams['legend.loc'] = 'best'
-    plt.rcParams.update({'axes.labelsize': 22})
-    plt.rcParams.update({'xtick.labelsize': 16})
-    plt.rcParams.update({'ytick.labelsize': 16})
-    plt.rcParams.update({'figure.figsize': (10, 6)})
-    plt.rcParams.update({'legend.fontsize': 20})
 
 def mape(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100

@@ -15,7 +15,7 @@ def get_config(interval):
             'Damping_slope':None, 
             'Optimized':True,
             'Use_boxcox':False,
-            'Training_length':30                
+            'Training_length':120                
         }
 
     elif interval=='Quarterly':
@@ -32,7 +32,7 @@ def get_config(interval):
             'Damping_slope':None, 
             'Optimized':True,
             'Use_boxcox':False,
-            'Training_length':100            
+            'Training_length':200            
         }
         
     elif interval=='Monthly':
