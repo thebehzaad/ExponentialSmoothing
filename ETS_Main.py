@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 from config import get_config
 from util_ets import *
 from ets_class import *
-from stldecompose import decompose
 
 #%% 
 
@@ -21,7 +20,7 @@ config_plot()
 #%% Loading data
 
 intervals=['Yearly', 'Quarterly', 'Monthly', 'Weekly', 'Daily', 'Hourly']
-interval='Quarterly'
+interval='Yearly'
 config=get_config(interval)
 
 print('loading data')
@@ -31,33 +30,30 @@ test_path = './data/Test/%s-test.csv' % (interval)
 train, test = create_datasets(train_path, test_path)
 
 #%% Model Fitting and Forecasting
+if interval=='Hourly':
+    cost=[]
+    for i in range(len(train)):
+        if i%1000==0:
+            print('{} out of {}'.format(i,len(train)))
+        ets = ETS_Class(np.log(train[i][-config['Training_length']:]), Mode=config['Model'], Damped=config['Damped'], Trend=config['Trend'], Seasonal=config['Seasonal'], Seasonal_periods=config['freq'])
+        ets.fit(Smoothing_level=config['Smoothing_level'], Smoothing_slope=config['Smoothing_slope'], Smoothing_seasonal=config['Smoothing_seasonal'], Damping_slope=config['Damping_slope'], Optimized=config['Optimized'], Use_boxcox=config['Use_boxcox'])
+        fcast_ets=ets.forcast(config['Horizon'])
+        cost.append(smape(test[i],np.exp(fcast_ets)))
 
-cost=[]
-for i in range(len(train)):
-    if i%1000==0:
-        print('{} out of {}'.format(i,len(train)))
-    ets = ETS_Class(train[i][-config['Training_length']:], Mode=config['Model'], Damped=config['Damped'], Trend=config['Trend'], Seasonal=config['Seasonal'], Seasonal_periods=config['freq'])
-    ets.fit(Smoothing_level=config['Smoothing_level'], Smoothing_slope=config['Smoothing_slope'], Smoothing_seasonal=config['Smoothing_seasonal'], Damping_slope=config['Damping_slope'], Optimized=config['Optimized'], Use_boxcox=config['Use_boxcox'])
-    fcast_ets=ets.forcast(config['Horizon'])
-    cost.append(smape(test[i],fcast_ets))
+    avg_cost=np.mean(cost)
+    print('Average Cost for {} Series is {}'.format(interval,avg_cost))
+else:
+    cost=[]
+    for i in range(len(train)):
+        if i%1000==0:
+            print('{} out of {}'.format(i,len(train)))
+        ets = ETS_Class(train[i][-config['Training_length']:], Mode=config['Model'], Damped=config['Damped'], Trend=config['Trend'], Seasonal=config['Seasonal'], Seasonal_periods=config['freq'])
+        ets.fit(Smoothing_level=config['Smoothing_level'], Smoothing_slope=config['Smoothing_slope'], Smoothing_seasonal=config['Smoothing_seasonal'], Damping_slope=config['Damping_slope'], Optimized=config['Optimized'], Use_boxcox=config['Use_boxcox'])
+        fcast_ets=ets.forcast(config['Horizon'])
+        cost.append(smape(test[i],fcast_ets))
 
-avg_cost=np.mean(cost)
-print('Average Cost for {} Series is {}'.format(interval,avg_cost))
-
-#%% One-Step Prediction
-
-#pred_ets=np.array([])
-#existing_values=train_data
-#ets = ETS_Class(existing_values, Mode='Holt-Winter', Damped=True, Trend='add', Seasonal='add', Seasonal_periods=seasonal_para)
-#ets.fit(Optimized=True)
-#pred_ets=np.concatenate((pred_ets,ets.forcast(1)))
-#
-#for i in range(test_data.shape[0]-1):
-#    existing_values=np.concatenate((existing_values,test_data[i:i+1]))
-#    ets = ETS_Class(existing_values, Mode='Holt-Winter', Damped=False, Trend='add', Seasonal='add', Seasonal_periods=seasonal_para)
-#    ets.fit(Optimized=True)
-#    pred_ets=np.concatenate((pred_ets,ets.forcast(1)))
-
+    avg_cost=np.mean(cost)
+    print('Average Cost for {} Series is {}'.format(interval,avg_cost))
 
 #%% Plotting A Sample Data
     
