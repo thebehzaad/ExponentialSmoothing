@@ -6,6 +6,7 @@
 
 import numpy as np
 import pandas as pd
+import warnings
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing, Holt, ExponentialSmoothing 
 
 #%%
@@ -22,6 +23,7 @@ class ETS_Class:
             self.exp_smoothing=ExponentialSmoothing(ts, damped=Damped, trend=Trend, seasonal=Seasonal, seasonal_periods=Seasonal_periods)
 
     def fit(self, Smoothing_level=None, Smoothing_slope=None, Smoothing_seasonal=None, Damping_slope=None, Optimized=False, Use_boxcox=False):
+        warnings.filterwarnings('ignore')
         if self.mode=='Simple':
            self.fit_results=self.exp_smoothing.fit(smoothing_level=Smoothing_level, optimized=Optimized) 
         elif self.mode=='Holt':

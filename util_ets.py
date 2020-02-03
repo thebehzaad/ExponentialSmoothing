@@ -11,6 +11,7 @@ import numpy as np
 from matplotlib import dates
 from statsmodels.tsa.stattools import adfuller
 import matplotlib.pyplot as plt
+from collections import namedtuple
 
 #%%
 
@@ -30,19 +31,10 @@ def read_file(file_location):
     return series
 
 
-def create_val_set(train, output_size):
-    val = []
-    for i in range(len(train)):
-        val.append(train[i][len(train[i])-output_size:])
-        train[i] = train[i][0:len(train[i])-output_size]
-    return np.array(val)
-
-
-def create_datasets(train_file_location, test_file_location, output_size):
+def create_datasets(train_file_location, test_file_location):
     train = read_file(train_file_location)
     test = read_file(test_file_location)
-    val = create_val_set(train, output_size)
-    return train, val, test
+    return train, test
 
 
 def timeseries_plot(y, color, y_label):
@@ -109,14 +101,6 @@ def two_timeseries_plot(y1,y2, color, y_label):
 
 # average time series
 
-
-def bucket_avg(ts, bucket):
-    # ts is Sereis with index
-    # bucket =["30T","60T","M".....]
-    y = ts.resample(bucket).mean()
-    return y
-
-
 def config_plot():
     plt.style.use('seaborn-paper')
 #    plt.rcParams.update({'axes.prop_cycle': cycler(color='jet')})
@@ -127,7 +111,9 @@ def config_plot():
     plt.rcParams.update({'ytick.labelsize': 16})
     plt.rcParams.update({'figure.figsize': (10, 6)})
     plt.rcParams.update({'legend.fontsize': 20})
-    return 1
 
-def mean_absolute_percentage_error(y_true, y_pred):
+def mape(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+
+def smape(y_true,y_pred):
+    return np.mean(np.abs(y_true-y_pred)/(np.abs(y_true)+np.abs(y_pred)))*200
